@@ -1,3 +1,7 @@
+/// <reference path="rfid.ino" />
+/// <reference path="rfidmastermind.ino" />
+/// <reference path="leds.ino" />
+
 byte gamePhase = 0;
 byte targetColors[TURNS];
 byte turnColors[ROUNDS][TURNS];
@@ -44,6 +48,22 @@ void GAME_Init()
     gamePhase = 0;
 }
 
+void Game_Shift_Turns_Up()
+{
+    for (byte o = 0; o < ROUNDS - 1; o++)
+    {
+        for (byte i = 0; i < TURNS; i++)
+        {
+            turnColors[o][i] = turnColors[o + 1][i];
+        }
+    }
+
+    for (byte i = 0; i < TURNS; i++)
+    {
+        turnColors[ROUNDS - 1][i] = 0;
+    }
+}
+
 void GAME_Update()
 {
     switch (gamePhase)
@@ -79,7 +99,7 @@ void GAME_Entry_Update()
     if (cardid != NULL && cardid != lastTurn)
     {
         lastTurn = cardid;
-        
+
         if (cardid == RED_CARD_ID)
         {
             LEDS_SetAll(RED_DIM_COLOR);
@@ -180,16 +200,26 @@ void GAME_End_Round()
 
     if (currentRound == ROUNDS)
     {
-        LEDS_Flash(strip.Color(55, 0, 0), 5, 100);
-        GAME_Draw_Turns();
-        delay(5000);
-        appPhase = 0;
-        Serial.println("You lost!");
+        if (gameMode == 0)
+        {
+            LEDS_Flash(strip.Color(55, 0, 0), 5, 100);
+            GAME_Draw_Turns();
+            delay(5000);
+            appPhase = 0;
+            Serial.println("You lost!");
+        }
+        else
+        {
+            LEDS_SetAll(strip.Color(0, 0, 0));
+            Game_Shift_Turns_Up();
+            currentRound--;
+            GAME_Draw_Turns();
+        }
     }
 }
 
 void GAME_Draw_Turns()
-{ 
+{
     for (byte o = 0; o < ROUNDS; o++)
     {
         byte correctThisRound = roundCorrect[o];

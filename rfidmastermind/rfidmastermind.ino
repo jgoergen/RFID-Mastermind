@@ -1,3 +1,7 @@
+/// <reference path="rfid.ino" />
+/// <reference path="game.ino" />
+/// <reference path="leds.ino" />
+
 // rfid lib https://github.com/adafruit/Adafruit-PN532
 
 // SETTINGS ///////////////////////////////////////////////////////////////
@@ -12,32 +16,33 @@
 #include <Wire.h>
 #include <Adafruit_PN532.h>
 
-#define PN532_IRQ_PIN   2
+#define PN532_IRQ_PIN 2
 #define PN532_RESET_PIN 3
-#define NEOPIXEL_PIN    12
+#define NEOPIXEL_PIN 12
 
-#define RED_CARD_ID     0x89BA4B1F //0x994A5969 
-#define GREEN_CARD_ID   0x89BA48D1 //0x99AF5769
-#define YELLOW_CARD_ID  0x89BA4277 //0xA98B5D69
-#define BLUE_CARD_ID    0x89BA430E //0xF92D6169
+#define RED_CARD_ID 0x994A5969
+#define GREEN_CARD_ID 0x99AF5769
+#define YELLOW_CARD_ID 0x4AAA4A80
+#define BLUE_CARD_ID 0xF92D6169
 
-#define NEOPIXEL_COUNT  20
+#define NEOPIXEL_COUNT 20
 
 Adafruit_PN532 nfc(PN532_IRQ_PIN, PN532_RESET_PIN);
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 uint32_t RED_COLOR = strip.Color(255, 0, 0);
-uint32_t RED_DIM_COLOR = strip.Color(20, 0, 0);
+uint32_t RED_DIM_COLOR = strip.Color(10, 0, 0);
 uint32_t GREEN_COLOR = strip.Color(0, 255, 0);
-uint32_t GREEN_DIM_COLOR = strip.Color(0, 20, 0);
+uint32_t GREEN_DIM_COLOR = strip.Color(0, 10, 0);
 uint32_t BLUE_COLOR = strip.Color(0, 0, 255);
-uint32_t BLUE_DIM_COLOR = strip.Color(0, 0, 20);
+uint32_t BLUE_DIM_COLOR = strip.Color(0, 0, 10);
 uint32_t YELLOW_COLOR = strip.Color(225, 235, 52);
-uint32_t YELLOW_DIM_COLOR = strip.Color(20, 16, 3);
+uint32_t YELLOW_DIM_COLOR = strip.Color(13, 12, 2);
 
 unsigned long introStartTime = 0;
 unsigned long elapsed;
 byte appPhase = 0;
+bool gameMode = 1; // 0 == fixed turn count, 1 == endless (multiplayer)
 
 void setup()
 {

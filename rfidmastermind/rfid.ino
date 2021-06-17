@@ -1,3 +1,7 @@
+/// <reference path="rfidmastermind.ino" />
+/// <reference path="game.ino" />
+/// <reference path="leds.ino" />
+
 void RFID_Init()
 {
     nfc.begin();
